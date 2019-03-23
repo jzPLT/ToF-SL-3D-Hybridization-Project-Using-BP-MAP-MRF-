@@ -5,10 +5,10 @@
   #KinectV2 uses the NtKinect header file file
 
 #BP-Test 2.0 is a self-contained project for processing images using the Belief Propogation Algorithm.
-  #Only 1 .cpp file should be used in the solution at a time.
-    #restore.cpp -> 1 input img, applies BP to restore img.
-    #stereo.cpp -> 2 inuput imgs, applies BP to find disparity map.
-    #noise.cpp -> 1 input img, adds noise to img.
+#Only 1 .cpp file should be used in the solution at a time.
+#restore.cpp -> 1 input img, applies BP to restore img.
+#stereo.cpp -> 2 inuput imgs, applies BP to find disparity map.
+#noise.cpp -> 1 input img, adds noise to img.
 ***Note: Does not work with .tif or .jpeg file formats. Code uses its own image class for reading and writing.
 ***Valid image formats included in the pnmfile.h file. (Includes .pgm, .pbm, .ppm)
 ***Code to convert from openCV Mat object to image class can be found in CombineKinects
