@@ -1,0 +1,4 @@
+﻿  restore.cpp
+d:\visual studio\bp-test 2.1\bp-test\pnmfile.h(148): warning C4101: 'doc': unreferenced local variable
+d:\visual studio\bp-test 2.1\bp-test\restore.cpp(305): warning C4101: 'edges': unreferenced local variable
+  BP-Test.vcxproj -> D:\Visual Studio\BP-Test 2.1\x64\Debug\BP-Test.exe
