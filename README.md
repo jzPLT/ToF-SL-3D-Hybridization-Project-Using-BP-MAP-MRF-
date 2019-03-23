@@ -20,6 +20,6 @@
     #Possible Gray level values should be set by the constant VALUES.  \
     #ALPHA biases towards the second input image pixel values, BETA biases towards the first input image pixel values 
     
-#ransactest sample matlab code for finding the homography matrix between 2 images.
-  #our case uses the IR images from the cameras and required a gamma transformation between the images to get a good homography.
+#ransactest sample matlab code for finding the homography matrix between 2 images. \
+  #our case uses the IR images from the cameras and required a gamma transformation between the images to get a good homography. \
   #Homography matrix found in the Tform object
