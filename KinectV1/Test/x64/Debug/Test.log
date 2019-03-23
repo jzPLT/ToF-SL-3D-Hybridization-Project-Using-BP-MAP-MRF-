@@ -1,0 +1,3 @@
+﻿  TestGrabFrame.cpp
+d:\visual studio\kinectv1\test\testgrabframe.cpp(420): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Test.vcxproj -> D:\Visual Studio\KinectV1\x64\Debug\Test.exe
