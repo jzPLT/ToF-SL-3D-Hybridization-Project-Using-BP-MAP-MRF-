@@ -46,7 +46,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
 
 #define INF 1E10     // large cost
-#define VALUES 4000   // number of possible graylevel values
+#define VALUES 3800   // number of possible graylevel values
 
 #define SBIAS 1.0F		//Adjusts smoothness term bias (Decrease to bias towards smoothess)
 #define DBIAS 1.0F		//Adjusts data term bias (Decrease to bias towards data)
@@ -65,6 +65,7 @@ float* Restore::dt(float *f, int n, int &low, int &up) {
 	z[0] = -INF; // Locations of boundaies between parabolas
 	z[1] = +INF;
 
+
 	// Compute lower envelope
 	for (int q = low + 1; q <= up - 1; q++) {
 		float s = ((f[q] + square(q)) - (f[v[k]] + square(v[k])))
@@ -81,16 +82,17 @@ float* Restore::dt(float *f, int n, int &low, int &up) {
 	}
 
 	k = 0;
-
+	
 	for (int q = low; q <= up - 1; q++) {
 		while (z[k + 1] < q)
 			k++;
 		d[q] = square(q - v[k]) + f[v[k]];
-
+	
 	}
 	delete[] v;
 	delete[] z;
 	return d;
+
 }
 
 
@@ -107,7 +109,6 @@ void Restore::msg(float s1[VALUES], float s2[VALUES],
 		if (dst[value] < minimum)
 			minimum = dst[value];
 	}
-
 
 	// dt
 	float *tmp = dt(dst, VALUES, low, up);
@@ -127,6 +128,7 @@ void Restore::msg(float s1[VALUES], float s2[VALUES],
 		dst[value] -= val;
 
 	delete tmp;
+	
 }
 
 // computation of data costs
@@ -286,7 +288,7 @@ image<uint16_t>* Restore::restore_ms(image<uint16_t>* img1, image<uint16_t>* img
 			
 			if (lowerbound == 0 && bound0 == 1) {
 
-				for (int value = lowerbound; value <= upperbound; value++) {
+				for (int value = lowerbound; value <= upperbound + ((int)(upperbound-lowerbound)*0.10); value++) {
 					//float val2 = square((float)(imRef(img2, x, y) - value));
 					//imRef(data[0], x, y)[value] = (LAMBDA1 * std::min(val2, DATA_K));
 					imRef(data[0], x, y)[value] = (LAMBDA1 * DATA_K);
@@ -296,7 +298,7 @@ image<uint16_t>* Restore::restore_ms(image<uint16_t>* img1, image<uint16_t>* img
 
 			else if (lowerbound == 0 && bound0 == 2) {
 
-				for (int value = lowerbound; value <= upperbound; value++) {
+				for (int value = lowerbound; value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) {
 					//float val = square((float)(imRef(img1, x, y) - value));
 					//imRef(data[0], x, y)[value] = (LAMBDA1 * std::min(val, DATA_K));
 					imRef(data[0], x, y)[value] = (LAMBDA1 * DATA_K);
@@ -305,7 +307,7 @@ image<uint16_t>* Restore::restore_ms(image<uint16_t>* img1, image<uint16_t>* img
 			}
 
 			else {
-				for (int value = lowerbound; value <= upperbound; value++) {
+				for (int value = lowerbound - ((int)(upperbound - lowerbound)*0.10); value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) {
 
 					//Quadratic model for data cost
 					float val = square((float)(imRef(img1, x, y) - value));
@@ -346,10 +348,14 @@ image<uint16_t>* Restore::restore_ms(image<uint16_t>* img1, image<uint16_t>* img
 					lowerbound = imRef(img2, x, y);
 				}
 
-				for (int value = lowerbound; value <= upperbound; value++) {
-					imRef(data[i], x / 2, y / 2)[value] += imRef(data[i - 1], x, y)[value];
-				}
-
+				if (lowerbound == 0) 
+					for (int value = lowerbound; value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) 
+						imRef(data[i], x / 2, y / 2)[value] += imRef(data[i - 1], x, y)[value];
+				
+				else
+					for (int value = lowerbound - ((int)(upperbound - lowerbound)*0.10); value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) 
+						imRef(data[i], x / 2, y / 2)[value] += imRef(data[i - 1], x, y)[value];
+				
 			}
 		}
 	}
@@ -389,12 +395,21 @@ image<uint16_t>* Restore::restore_ms(image<uint16_t>* img1, image<uint16_t>* img
 						lowerbound = imRef(img2, x, y);
 					}
 
-					for (int value = lowerbound; value <= upperbound; value++) {
-						imRef(u[i], x, y)[value] = imRef(u[i + 1], x / 2, y / 2)[value];
-						imRef(d[i], x, y)[value] = imRef(d[i + 1], x / 2, y / 2)[value];
-						imRef(l[i], x, y)[value] = imRef(l[i + 1], x / 2, y / 2)[value];
-						imRef(r[i], x, y)[value] = imRef(r[i + 1], x / 2, y / 2)[value];
-					} 
+					if (lowerbound == 0)
+						for (int value = lowerbound; value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) {
+							imRef(u[i], x, y)[value] = imRef(u[i + 1], x / 2, y / 2)[value];
+							imRef(d[i], x, y)[value] = imRef(d[i + 1], x / 2, y / 2)[value];
+							imRef(l[i], x, y)[value] = imRef(l[i + 1], x / 2, y / 2)[value];
+							imRef(r[i], x, y)[value] = imRef(r[i + 1], x / 2, y / 2)[value];
+						} 
+
+					else 
+						for (int value = lowerbound - ((int)(upperbound - lowerbound)*0.10); value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) {
+							imRef(u[i], x, y)[value] = imRef(u[i + 1], x / 2, y / 2)[value];
+							imRef(d[i], x, y)[value] = imRef(d[i + 1], x / 2, y / 2)[value];
+							imRef(l[i], x, y)[value] = imRef(l[i + 1], x / 2, y / 2)[value];
+							imRef(r[i], x, y)[value] = imRef(r[i + 1], x / 2, y / 2)[value];
+						}
 					
 				}
 			}
@@ -457,31 +472,47 @@ image<uint16_t>* Restore::restore_ms(image<uint16_t>* img1, image<uint16_t>* img
 			int best = 0;
 			float best_val = INF;
 
-			int lowerbound, upperbound, bound0;
+			int lowerbound, upperbound;
 			if (imRef(img2, x, y) > imRef(img1, x, y)) {
-				bound0 = 1;
 				upperbound = imRef(img2, x, y);
 				lowerbound = imRef(img1, x, y);
 			}
 			else {
-				bound0 = 2;
 				upperbound = imRef(img1, x, y);
 				lowerbound = imRef(img2, x, y);
 			}
 
+			if (lowerbound == 0) {
+				for (int value = lowerbound; value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) {
+					float val =
+						SBIAS *
+						(imRef(u[0], x, y + 1)[value] +
+							imRef(d[0], x, y - 1)[value] +
+							imRef(l[0], x + 1, y)[value] +
+							imRef(r[0], x - 1, y)[value]) +
 
-			for (int value = lowerbound; value <= upperbound; value++) {
-				float val =
-					SBIAS*
-					(imRef(u[0], x, y + 1)[value] +
-					imRef(d[0], x, y - 1)[value] +
-					imRef(l[0], x + 1, y)[value] +
-					imRef(r[0], x - 1, y)[value]) +
-					
-					(DBIAS*imRef(data[0], x, y)[value]);
-				if (val < best_val) {
-					best_val = val;
-					best = value;
+							(DBIAS*imRef(data[0], x, y)[value]);
+					if (val < best_val) {
+						best_val = val;
+						best = value;
+					}
+				}
+			}
+
+			else {
+				for (int value = lowerbound - ((int)(upperbound - lowerbound)*0.10); value <= upperbound + ((int)(upperbound - lowerbound)*0.10); value++) {
+					float val =
+						SBIAS *
+						(imRef(u[0], x, y + 1)[value] +
+							imRef(d[0], x, y - 1)[value] +
+							imRef(l[0], x + 1, y)[value] +
+							imRef(r[0], x - 1, y)[value]) +
+
+							(DBIAS*imRef(data[0], x, y)[value]);
+					if (val < best_val) {
+						best_val = val;
+						best = value;
+					}
 				}
 			}
 

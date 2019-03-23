@@ -27,7 +27,7 @@
 
 
 #define INF 1E10     // large cost
-#define VALUES 4000   // number of possible graylevel values
+#define VALUES 3800   // number of possible graylevel values
 
 class Restore
 {
